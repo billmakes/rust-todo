@@ -2,23 +2,23 @@ use std::io;
 use std::io::prelude::*;
 
 struct Todo {
-    id: i32,
+    id: usize,
     content: String,
     done: bool,
 }
 
 impl Todo {
     fn print(&self) {
-        println!("{}", self.id);
+        println!("---------------------------------------");
+        println!("id: {}, done: {}", self.id, self.done);
         println!("{}", self.content);
-        println!("{}", self.done);
     }
 }
 
 fn main() {
     let mut todo_list: Vec<Todo> = Vec::new();
-
     loop {
+        println!("---------------------------------------");
         print!("Enter command: ");
         let _ = io::stdout().flush();
         let mut action = String::new();
@@ -30,57 +30,50 @@ fn main() {
             action.split_whitespace().map(|s| s.to_string()).collect();
         let command = action_vec.remove(0);
         let action_body = action_vec.join(" ");
-        // println!("{}", command);
-        // println!("{:?}", action_body);
 
         match command.trim() {
-            "add" => {
+            "add" | "a" => {
                 add_action(&mut todo_list, action_body);
             }
-            "done" => {
-                done_action(&mut todo_list, 1, true);
+            "edit" | "e" => {
+                let id_str = action_vec.remove(0);
+                match id_str.parse::<usize>() {
+                    Ok(id) => edit_action(&mut todo_list, id, action_vec.join(" ")),
+                    _ => println!("invalid id"),
+                }
             }
-            "undone" => {
-                done_action(&mut todo_list, 1, false);
+            "remove" | "rm" => {
+                let id_str = action_vec.remove(0);
+                match id_str.parse::<usize>() {
+                    Ok(id) => remove_action(&mut todo_list, id),
+                    _ => println!("invalid id"),
+                }
             }
-            "list" => {
+            "done" | "d" => {
+                let id_str = action_vec.remove(0);
+                match id_str.parse::<usize>() {
+                    Ok(id) => done_action(&mut todo_list, id, true),
+                    _ => println!("invalid id"),
+                }
+            }
+            "undone" | "ud" => {
+                let id_str = action_vec.remove(0);
+                match id_str.parse::<usize>() {
+                    Ok(id) => done_action(&mut todo_list, id, false),
+                    _ => println!("invalid id"),
+                }
+            }
+            "list" | "ls" => {
                 print_list(&todo_list);
             }
-            "help" => help_action(),
+            "quit" | "q" => break,
+            "help" | "h" => help_action(),
             _ => {
                 println!("invalid command");
                 help_action();
             }
         };
     }
-}
-
-fn print_list(list: &[Todo]) {
-    for item in list.iter() {
-        item.print();
-    }
-}
-
-fn done_action(list: &mut [Todo], id: i32, done: bool) {
-    for item in list.iter_mut() {
-        if item.id == id {
-            item.done = done;
-            let msg = if done { "completed" } else { "undoing" };
-            println!("{msg} the following item:");
-            item.print();
-        }
-    }
-}
-
-fn add_action(list: &mut Vec<Todo>, content: String) {
-    let todo = Todo {
-        id: 1,
-        content,
-        done: false,
-    };
-    println!("added the following item:");
-    todo.print();
-    list.push(todo);
 }
 
 fn help_action() {
@@ -92,4 +85,59 @@ fn help_action() {
     println!("done <item_id>: completes item");
     println!("undone <item_id>: resets item");
     println!("remove <item_id>: removes an item from the list");
+}
+
+fn print_list(list: &[Todo]) {
+    for item in list.iter() {
+        item.print();
+    }
+}
+
+fn remove_action(list: &mut Vec<Todo>, id: usize) {
+    println!("removing item with id of {}", id);
+    list.retain_mut(|i| i.id != id);
+}
+
+fn edit_action(list: &mut [Todo], id: usize, content: String) {
+    for item in list.iter_mut() {
+        if item.id == id {
+            item.content = content;
+            println!("edited the following item:");
+            item.print();
+            break;
+        } else {
+            println!("item with id: {} doesn't exist!", id);
+        }
+    }
+}
+
+fn done_action(list: &mut [Todo], id: usize, done: bool) {
+    for item in list.iter_mut() {
+        if item.id == id {
+            item.done = done;
+            let msg = if done { "completed" } else { "undoing" };
+            println!("{msg} the following item:");
+            item.print();
+            break;
+        } else {
+            println!("item with id: {} doesn't exist!", id);
+        }
+    }
+}
+
+fn add_action(list: &mut Vec<Todo>, content: String) {
+    let id = if list.is_empty() {
+        1
+    } else {
+        list[list.len() - 1].id + 1
+    };
+
+    let todo = Todo {
+        id,
+        content,
+        done: false,
+    };
+    println!("added the following item:");
+    todo.print();
+    list.push(todo);
 }
