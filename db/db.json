@@ -1,0 +1,17 @@
+[
+  {
+    "id": 2,
+    "content": "this is new",
+    "done": true
+  },
+  {
+    "id": 3,
+    "content": "another one",
+    "done": false
+  },
+  {
+    "id": 4,
+    "content": "new todo item",
+    "done": false
+  }
+]

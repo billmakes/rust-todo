@@ -1,6 +1,9 @@
+use serde::{Deserialize, Serialize};
+use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 
+#[derive(Serialize, Deserialize)]
 struct Todo {
     id: usize,
     content: String,
@@ -15,8 +18,10 @@ impl Todo {
     }
 }
 
-fn main() {
-    let mut todo_list: Vec<Todo> = Vec::new();
+fn main() -> Result<(), std::io::Error> {
+    let file_path = "./db/db.json";
+    let file = File::open(file_path).expect("File not found");
+    let mut todo_list: Vec<Todo> = serde_json::from_reader(file).expect("error while reading");
     loop {
         println!("---------------------------------------");
         print!("Enter command: ");
@@ -74,6 +79,8 @@ fn main() {
             }
         };
     }
+    std::fs::write(file_path, serde_json::to_string_pretty(&todo_list).unwrap())?;
+    Ok(())
 }
 
 fn help_action() {
