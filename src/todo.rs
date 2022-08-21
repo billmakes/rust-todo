@@ -10,9 +10,12 @@ pub struct Todo {
 
 impl Todo {
     fn print(&self) {
-        handle_print("---------------------------------------".to_string());
-        handle_print(format!("id: {}, done: {}", self.id, self.done));
-        handle_print(self.content.to_string());
+        handle_print(format!(
+            "---------------------------------------\n\
+            id: {}, done: {}\n\
+            {}",
+            self.id, self.done, self.content
+        ))
     }
 }
 

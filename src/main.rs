@@ -89,14 +89,17 @@ fn main() -> Result<(), std::io::Error> {
 }
 
 fn help_action() {
-    handle_print("Available Commmands".to_string());
-    handle_print("--------------------------------------------------".to_string());
-    handle_print("(help | h): prints this help menu".to_string());
-    handle_print("(list | ls): lists all items".to_string());
-    handle_print("(add | a ) <content>: adds an item to the list".to_string());
-    handle_print("(edit | e) <item_id> <content>: change content of item".to_string());
-    handle_print("(done | d) <item_id>: completes item".to_string());
-    handle_print("(undone | ud) <item_id>: resets item".to_string());
-    handle_print("(remove | rm) <item_id>: removes an item from the list".to_string());
-    handle_print("(quit | q): exits the program".to_string());
+    handle_print(
+        "Available Commmands\n\
+        --------------------------------------------------\n\
+        (help | h): prints this help menu\n\
+        (list | ls): lists all items\n\
+        (add | a ) <content>: adds an item to the list\n\
+        (edit | e) <item_id> <content>: change content of item\n\
+        (done | d) <item_id>: completes item\n\
+        (undone | ud) <item_id>: resets item\n\
+        (remove | rm) <item_id>: removes an item from the list\n\
+        (quit | q): exits the program"
+            .to_string(),
+    );
 }
