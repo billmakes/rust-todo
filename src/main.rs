@@ -79,12 +79,14 @@ fn main() {
 fn help_action() {
     println!("Available Commmands");
     println!("--------------------------------------------------");
-    println!("list: lists all items");
-    println!("add <content>: adds an item to the list");
-    println!("edit <item_id> <content>: change content of item");
-    println!("done <item_id>: completes item");
-    println!("undone <item_id>: resets item");
-    println!("remove <item_id>: removes an item from the list");
+    println!("(help | h): prints this help menu");
+    println!("(list | ls): lists all items");
+    println!("(add | a ) <content>: adds an item to the list");
+    println!("(edit | e) <item_id> <content>: change content of item");
+    println!("(done | d) <item_id>: completes item");
+    println!("(undone | ud) <item_id>: resets item");
+    println!("(remove | rm) <item_id>: removes an item from the list");
+    println!("(quit | q): exits the program");
 }
 
 fn print_list(list: &[Todo]) {
