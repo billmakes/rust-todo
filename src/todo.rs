@@ -1,3 +1,4 @@
+use crate::handle_print::handle_print;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -9,9 +10,9 @@ pub struct Todo {
 
 impl Todo {
     fn print(&self) {
-        println!("---------------------------------------");
-        println!("id: {}, done: {}", self.id, self.done);
-        println!("{}", self.content);
+        handle_print("---------------------------------------".to_string());
+        handle_print(format!("id: {}, done: {}", self.id, self.done));
+        handle_print(self.content.to_string());
     }
 }
 
@@ -22,7 +23,7 @@ pub fn print_list(list: &[Todo]) {
 }
 
 pub fn remove_action(list: &mut Vec<Todo>, id: usize) {
-    println!("removing item with id of {}", id);
+    handle_print(format!("removing item with id of {id}"));
     list.retain_mut(|i| i.id != id);
 }
 
@@ -30,11 +31,11 @@ pub fn edit_action(list: &mut [Todo], id: usize, content: String) {
     for item in list.iter_mut() {
         if item.id == id {
             item.content = content;
-            println!("edited the following item:");
+            handle_print("edited the following item:".to_string());
             item.print();
             break;
         } else {
-            println!("item with id: {} doesn't exist!", id);
+            handle_print(format!("item with id: {id} doesn't exist!"));
         }
     }
 }
@@ -44,11 +45,11 @@ pub fn done_action(list: &mut [Todo], id: usize, done: bool) {
         if item.id == id {
             item.done = done;
             let msg = if done { "completed" } else { "undoing" };
-            println!("{msg} the following item:");
+            handle_print(format!("{msg} the following item:"));
             item.print();
             break;
         } else {
-            println!("item with id: {} doesn't exist!", id);
+            handle_print(format!("item with id: {id} doesn't exist!"));
         }
     }
 }
@@ -65,7 +66,7 @@ pub fn add_action(list: &mut Vec<Todo>, content: String) {
         content,
         done: false,
     };
-    println!("added the following item:");
+    handle_print("added the following item:".to_string());
     todo.print();
     list.push(todo);
 }
