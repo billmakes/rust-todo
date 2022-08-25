@@ -29,10 +29,6 @@ fn main() -> Result<(), std::io::Error> {
         if action.command.trim().is_empty() {
             help_action();
         } else {
-            // let mut action_vec: Vec<String> =
-            //     action.split_whitespace().map(|s| s.to_string()).collect();
-            // let command = action_vec.remove(0);
-            // let action_body = action_vec.join(" ");
             match action.command.trim() {
                 "add" | "a" => {
                     todo_list.add_action(action.body);
