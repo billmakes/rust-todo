@@ -1,36 +1,16 @@
-use std::fs::File;
 use std::io;
 use std::io::prelude::*;
-use std::io::{BufRead, BufReader, Error, ErrorKind};
-use std::process::{Command, Stdio};
 
 mod todo;
-use todo::add_action;
-use todo::done_action;
-use todo::edit_action;
-use todo::print_list;
-use todo::remove_action;
-use todo::Todo;
+use todo::TodoList;
 
 mod handle_print;
 use handle_print::handle_print;
 
 fn main() -> Result<(), std::io::Error> {
-    let outputs = File::create("out.txt")?;
-    let errors = outputs.try_clone()?;
-
-    Command::new("ls")
-        .args(&[".", "oops"])
-        .stdout(Stdio::from(outputs))
-        .stderr(Stdio::from(errors))
-        .spawn()?
-        .wait_with_output()?;
     let file_path = "./db/db.json";
 
-    let mut todo_list: Vec<Todo> = match File::open(file_path) {
-        Ok(file) => serde_json::from_reader(file).expect("error while reading"),
-        _ => Vec::new(),
-    };
+    let mut todo_list = TodoList::new(Some(file_path));
 
     loop {
         handle_print("---------------------------------------".to_string());
@@ -52,38 +32,38 @@ fn main() -> Result<(), std::io::Error> {
 
             match command.trim() {
                 "add" | "a" => {
-                    add_action(&mut todo_list, action_body);
+                    todo_list.add_action(action_body);
                 }
                 "edit" | "e" => {
                     let id_str = action_vec.remove(0);
                     match id_str.parse::<usize>() {
-                        Ok(id) => edit_action(&mut todo_list, id, action_vec.join(" ")),
+                        Ok(id) => todo_list.edit_action(id, action_vec.join(" ")),
                         _ => handle_print("invalid id".to_string()),
                     }
                 }
                 "remove" | "rm" => {
                     let id_str = action_vec.remove(0);
                     match id_str.parse::<usize>() {
-                        Ok(id) => remove_action(&mut todo_list, id),
+                        Ok(id) => todo_list.remove_action(id),
                         _ => handle_print("invalid id".to_string()),
                     }
                 }
                 "done" | "d" => {
                     let id_str = action_vec.remove(0);
                     match id_str.parse::<usize>() {
-                        Ok(id) => done_action(&mut todo_list, id, true),
+                        Ok(id) => todo_list.done_action(id, true),
                         _ => handle_print("invalid id".to_string()),
                     }
                 }
                 "undone" | "ud" => {
                     let id_str = action_vec.remove(0);
                     match id_str.parse::<usize>() {
-                        Ok(id) => done_action(&mut todo_list, id, false),
+                        Ok(id) => todo_list.done_action(id, false),
                         _ => handle_print("invalid id".to_string()),
                     }
                 }
                 "list" | "ls" => {
-                    print_list(&todo_list);
+                    todo_list.print_list();
                 }
                 "quit" | "q" => break,
                 "help" | "h" => help_action(),
@@ -95,7 +75,10 @@ fn main() -> Result<(), std::io::Error> {
         }
     }
 
-    std::fs::write(file_path, serde_json::to_string_pretty(&todo_list).unwrap())?;
+    std::fs::write(
+        file_path,
+        serde_json::to_string_pretty(&todo_list.list).unwrap(),
+    )?;
     Ok(())
 }
 

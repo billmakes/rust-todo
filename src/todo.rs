@@ -1,5 +1,6 @@
 use crate::handle_print::handle_print;
 use serde::{Deserialize, Serialize};
+use std::fs::File;
 
 #[derive(Serialize, Deserialize)]
 pub struct Todo {
@@ -19,57 +20,74 @@ impl Todo {
     }
 }
 
-pub fn print_list(list: &[Todo]) {
-    for item in list.iter() {
-        item.print();
-    }
+pub struct TodoList {
+    pub list: Vec<Todo>,
 }
 
-pub fn remove_action(list: &mut Vec<Todo>, id: usize) {
-    handle_print(format!("removing item with id of {id}"));
-    list.retain_mut(|i| i.id != id);
-}
-
-pub fn edit_action(list: &mut [Todo], id: usize, content: String) {
-    for item in list.iter_mut() {
-        if item.id == id {
-            item.content = content;
-            handle_print("edited the following item:".to_string());
-            item.print();
-            break;
-        } else {
-            handle_print(format!("item with id: {id} doesn't exist!"));
+impl TodoList {
+    pub fn new(file_path: Option<&str>) -> Self {
+        match file_path {
+            Some(path) => match File::open(path) {
+                Ok(file) => Self {
+                    list: serde_json::from_reader(file).expect("error while reading"),
+                },
+                _ => Self { list: vec![] },
+            },
+            None => Self { list: vec![] },
         }
     }
-}
 
-pub fn done_action(list: &mut [Todo], id: usize, done: bool) {
-    for item in list.iter_mut() {
-        if item.id == id {
-            item.done = done;
-            let msg = if done { "completed" } else { "undoing" };
-            handle_print(format!("{msg} the following item:"));
+    pub fn print_list(&self) {
+        for item in self.list.iter() {
             item.print();
-            break;
-        } else {
-            handle_print(format!("item with id: {id} doesn't exist!"));
         }
     }
-}
 
-pub fn add_action(list: &mut Vec<Todo>, content: String) {
-    let id = if list.is_empty() {
-        1
-    } else {
-        list[list.len() - 1].id + 1
-    };
+    pub fn add_action(&mut self, content: String) {
+        let id = if self.list.is_empty() {
+            1
+        } else {
+            self.list[self.list.len() - 1].id + 1
+        };
 
-    let todo = Todo {
-        id,
-        content,
-        done: false,
-    };
-    handle_print("added the following item:".to_string());
-    todo.print();
-    list.push(todo);
+        let todo = Todo {
+            id,
+            content,
+            done: false,
+        };
+        handle_print("added the following item:".to_string());
+        todo.print();
+        self.list.push(todo);
+    }
+
+    pub fn remove_action(&mut self, id: usize) {
+        handle_print(format!("removing item with id of {id}"));
+        self.list.retain_mut(|i| i.id != id);
+    }
+
+    pub fn edit_action(&mut self, id: usize, content: String) {
+        for item in self.list.iter_mut() {
+            if item.id == id {
+                item.content = content;
+                handle_print("edited the following item:".to_string());
+                item.print();
+                break;
+            } else {
+                handle_print(format!("item with id: {id} doesn't exist!"));
+            }
+        }
+    }
+    pub fn done_action(&mut self, id: usize, done: bool) {
+        for item in self.list.iter_mut() {
+            if item.id == id {
+                item.done = done;
+                let msg = if done { "completed" } else { "undoing" };
+                handle_print(format!("{msg} the following item:"));
+                item.print();
+                break;
+            } else {
+                handle_print(format!("item with id: {id} doesn't exist!"));
+            }
+        }
+    }
 }
