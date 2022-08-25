@@ -1,22 +1,7 @@
 [
   {
     "id": 1,
-    "content": "this is a new item",
-    "done": false
-  },
-  {
-    "id": 2,
-    "content": "another new item",
-    "done": true
-  },
-  {
-    "id": 3,
-    "content": "adding an item",
-    "done": false
-  },
-  {
-    "id": 4,
-    "content": "1",
+    "content": "this has been edited",
     "done": false
   }
 ]

@@ -1,6 +1,8 @@
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
+use std::io::{BufRead, BufReader, Error, ErrorKind};
+use std::process::{Command, Stdio};
 
 mod todo;
 use todo::add_action;
@@ -14,6 +16,15 @@ mod handle_print;
 use handle_print::handle_print;
 
 fn main() -> Result<(), std::io::Error> {
+    let outputs = File::create("out.txt")?;
+    let errors = outputs.try_clone()?;
+
+    Command::new("ls")
+        .args(&[".", "oops"])
+        .stdout(Stdio::from(outputs))
+        .stderr(Stdio::from(errors))
+        .spawn()?
+        .wait_with_output()?;
     let file_path = "./db/db.json";
 
     let mut todo_list: Vec<Todo> = match File::open(file_path) {
