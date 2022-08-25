@@ -18,6 +18,11 @@ impl Action {
             0
         };
 
+        // if we have a real id remove the integer from the body
+        if id > 0 {
+            action_vec.remove(0);
+        }
+
         let body = action_vec.join(" ");
         Self { command, id, body }
     }

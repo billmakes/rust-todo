@@ -66,28 +66,22 @@ impl TodoList {
     }
 
     pub fn edit_action(&mut self, id: usize, content: String) {
-        for item in self.list.iter_mut() {
-            if item.id == id {
-                item.content = content;
-                handle_print("edited the following item:".to_string());
-                item.print();
-                break;
-            } else {
-                handle_print(format!("item with id: {id} doesn't exist!"));
-            }
+        if let Some(item) = self.list.iter_mut().find(|i| i.id == id) {
+            item.content = content;
+            handle_print("edited the following item: ".to_string());
+            item.print();
+        } else {
+            handle_print(format!("item with id: {id} doesn't exist!"));
         }
     }
+
     pub fn done_action(&mut self, id: usize, done: bool) {
-        for item in self.list.iter_mut() {
-            if item.id == id {
-                item.done = done;
-                let msg = if done { "completed" } else { "undoing" };
-                handle_print(format!("{msg} the following item:"));
-                item.print();
-                break;
-            } else {
-                handle_print(format!("item with id: {id} doesn't exist!"));
-            }
+        if let Some(item) = self.list.iter_mut().find(|i| i.id == id) {
+            item.done = done;
+            handle_print("edited the following item: ".to_string());
+            item.print();
+        } else {
+            handle_print(format!("item with id: {id} doesn't exist!"));
         }
     }
 }
