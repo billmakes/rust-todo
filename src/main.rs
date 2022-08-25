@@ -1,6 +1,9 @@
 use std::io;
 use std::io::prelude::*;
 
+mod action;
+use action::Action;
+
 mod todo;
 use todo::TodoList;
 
@@ -16,51 +19,35 @@ fn main() -> Result<(), std::io::Error> {
         handle_print("---------------------------------------".to_string());
         print!("Enter command: ");
         let _ = io::stdout().flush();
-        let mut action = String::new();
+        let mut action_str = String::new();
 
         io::stdin()
-            .read_line(&mut action)
+            .read_line(&mut action_str)
             .expect("Failed to read action");
 
-        if action.trim().is_empty() {
+        let action = Action::new(action_str);
+        if action.command.trim().is_empty() {
             help_action();
         } else {
-            let mut action_vec: Vec<String> =
-                action.split_whitespace().map(|s| s.to_string()).collect();
-            let command = action_vec.remove(0);
-            let action_body = action_vec.join(" ");
-
-            match command.trim() {
+            // let mut action_vec: Vec<String> =
+            //     action.split_whitespace().map(|s| s.to_string()).collect();
+            // let command = action_vec.remove(0);
+            // let action_body = action_vec.join(" ");
+            match action.command.trim() {
                 "add" | "a" => {
-                    todo_list.add_action(action_body);
+                    todo_list.add_action(action.body);
                 }
                 "edit" | "e" => {
-                    let id_str = action_vec.remove(0);
-                    match id_str.parse::<usize>() {
-                        Ok(id) => todo_list.edit_action(id, action_vec.join(" ")),
-                        _ => handle_print("invalid id".to_string()),
-                    }
+                    todo_list.edit_action(action.id, action.body);
                 }
                 "remove" | "rm" => {
-                    let id_str = action_vec.remove(0);
-                    match id_str.parse::<usize>() {
-                        Ok(id) => todo_list.remove_action(id),
-                        _ => handle_print("invalid id".to_string()),
-                    }
+                    todo_list.remove_action(action.id);
                 }
                 "done" | "d" => {
-                    let id_str = action_vec.remove(0);
-                    match id_str.parse::<usize>() {
-                        Ok(id) => todo_list.done_action(id, true),
-                        _ => handle_print("invalid id".to_string()),
-                    }
+                    todo_list.done_action(action.id, true);
                 }
                 "undone" | "ud" => {
-                    let id_str = action_vec.remove(0);
-                    match id_str.parse::<usize>() {
-                        Ok(id) => todo_list.done_action(id, false),
-                        _ => handle_print("invalid id".to_string()),
-                    }
+                    todo_list.done_action(action.id, false);
                 }
                 "list" | "ls" => {
                     todo_list.print_list();
